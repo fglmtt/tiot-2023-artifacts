@@ -1,0 +1,23 @@
+#Digital Twin Configuration
+
+digitalTwinId: testDT3
+targetDeviceId: testDevice3
+physicalMqttBrokerAddress: 192.168.1.17
+physicalMqttBrokerPort: 1883
+digitalMqttBrokerAddress: 192.168.1.17
+digitalMqttBrokerPort: 1884
+metricsEnabled: true
+httpApiPort: 5555
+prometheusHttpApiPort: 1234
+expectedMsgSec: 1
+observationBucketType: default
+observationBucketStart: 0.0
+observationBucketWidth: 0.005
+observationBucketCount: 50
+primeNumbersComputationCount: 10000
+shadowedThresholdMs: 1000
+unBoundThresholdMs: 10000
+odteSlidingWindowSec: 30
+odteDesiredTimelinessSec: 1.0
+odteExpectedMsgSec: 1.0
+odteTargetPercentile: 0.9
