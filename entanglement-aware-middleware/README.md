@@ -6,7 +6,7 @@ The first objective of the entanglement-aware middleware is to manage the execut
 
 ### Testbed Setup
 
-Run [`kubemake`](https://github.com/fglmtt/kubemake) to automatically set up the tesbed.
+Run [`kubemake`](../kubemake) to automatically set up the tesbed.
 
 ### Go
 
