@@ -1,0 +1,218 @@
+openapi: 3.0.0
+info:
+  title: webserver
+  description: rest api
+  version: v1
+
+components:
+  schemas:
+
+    metadata:
+      type: object
+      additionalProperties: {}
+
+    physicalTwin:
+      type: object
+      properties:
+        name:
+          type: string
+        metadata:
+          $ref: "#/components/schemas/metadata"
+          description: provides a (sub)set of the properties as key-value pairs to be captured in the digital space
+      required:
+        - name
+        - metadata
+
+    requirements:
+      type: object
+      properties:
+        preferredAffinity:
+          type: string
+          enum: [cloud, fog, edge, mec, onpremise]
+          description: specifies the preferred location deployment along the cloud-to-edge continuum
+        odte:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: sets the threshold below which the app is no longer considered entangled with the physical space. See Overall Digital Twin Entanglement (ODTE)
+
+    config:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [Deployment, Service, ConfigMap]
+          description: defines what kind of spec is
+        spec:
+          type: string
+      required:
+        - type
+        - spec
+
+    deployment:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [Kubernetes]
+          description: specifies what to expect in the file(s)
+        affinity:
+          type: string
+          enum: [cloud, fog, edge, mec, onpremise]
+        configs:
+          type: array
+          items:
+            $ref: "#/components/schemas/config"
+      description: provides one ore more config files that describe the overall deployment
+      required:
+        - type
+        - files
+
+    digitalTwin:
+      type: object
+      properties:
+        name:
+          type: string
+        source:
+          type: string
+          description: provides information about where to get the digital twin to deploy, e.g., link to the container image(s) to use
+        type:
+          type: string
+          enum: [simple, composed]
+          description: specifies if the digital twin is simple of composed. A composed digital twin is a digital twin built by composition of one ore more simple ones
+        twinOf:
+          type: array
+          items:
+            type: string
+          description: lists the physical counterparts, i.e., the physical twins, of the digital twin
+        requirements:
+          $ref: "#/components/schemas/requirements"
+        deployments:
+          type: array
+          items:
+            $ref: "#/components/schemas/deployment"
+      required:
+        - name
+        - source
+        - type
+        - twinof
+        - deployments
+
+    app:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: identifier
+        physicalTwins:
+          type: array
+          items:
+            $ref: "#/components/schemas/physicalTwin"
+        digitalTwins:
+          type: array
+          items:
+            $ref: "#/components/schemas/digitalTwin"
+      required:
+        - physicalTwins
+        - digitalTwins
+
+servers:
+  - url: http://dtm.edu/v1
+
+paths:
+
+  /apps:
+    get:
+      description: gets all apps
+      responses:
+        "200":
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/app"
+        "500":
+          description: "internal server error"
+    post:
+      description: creates app
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/app"
+      responses:
+        "201":
+          description: "created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/app"
+        "400":
+          description: "bad request"
+        "500":
+          description: "internal server error"
+
+  /apps/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      description: gets app by id
+      responses:
+        "200":
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/app"
+        "404":
+          description: "not found"
+        "500":
+          description: "internal server error"
+    put:
+      description: updates app by id
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/app"
+      responses:
+        "200":
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/app"
+        "400":
+          description: "bad request"
+        "404":
+          description: "not found"
+        "500":
+          description: "internal server error"
+    delete:
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      description: deletes app by id
+      responses:
+        "200":
+          description: "ok"
+        "404":
+          description: "not found"
+        "500":
+          description: "internal server error"
