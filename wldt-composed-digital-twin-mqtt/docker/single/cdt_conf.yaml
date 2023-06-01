@@ -1,0 +1,30 @@
+#Digital Twin Configuration
+
+digitalTwinId: composedDT
+deviceIdList: testDevice1,testDevice2,testDevice3
+resourceMap:
+  energy: iot.sensor.energy
+  temperature: iot.sensor.temperature
+aggregationAction: avg
+aggregationType: sample
+aggregationUnit: msg
+aggregationWindow: 10
+aggregationStateTopic: aggregated_state
+targetMqttBrokerAddress: 192.168.1.17
+targetMqttBrokerPort: 1884
+metricsEnabled: true
+aggregateWithStateMessages: true
+httpApiPort: 5555
+prometheusHttpApiPort: 1234
+expectedMsgSec: 3
+observationBucketType: default
+observationBucketStart: 0.0
+observationBucketWidth: 0.005
+observationBucketCount: 50
+primeNumbersComputationCount: 10000
+shadowedThresholdMs: 1000
+unBoundThresholdMs: 10000
+odteSlidingWindowSec: 30
+odteDesiredTimelinessSec: 1.0
+odteExpectedMsgSec: 3.0
+odteTargetPercentile: 0.9
