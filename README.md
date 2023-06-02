@@ -12,7 +12,7 @@ This repository is structured as follows:
 ├── experiments/                          # Scripts, configuration files, and instructions to reproduce the experiments
 ├── iiot-device/                          # Source code of the IIoT device emulator
 ├── kubemake/                             # Source code of the Ansible project to automatically configure the testbed
-├── wldt-composed-digital-twin-mqtt/      # Source code of the entanglement-aware DTs
-├── wldt-digital-twin-mqtt/               # Source code of the entanglement-aware DTs (composed version)
+├── wldt-composed-digital-twin-mqtt/      # Source code of the entanglement-aware DTs (composed version)
+├── wldt-digital-twin-mqtt/               # Source code of the entanglement-aware DTs
 └── README.md                             # This file
 ```
