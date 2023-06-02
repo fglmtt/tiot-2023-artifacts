@@ -38,7 +38,7 @@ spec:
       - name: gitlab-registry-credentials
       containers:
       - name: iiot-device-2
-        image: registry.gitlab.com/piconem-university/projects/dt-software-patterns/iiot-device:0.3
+        image: myregistry.com/iiot-device:0.3
         ports:
         - name: http-api
           protocol: TCP
