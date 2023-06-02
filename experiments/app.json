@@ -1,0 +1,165 @@
+{
+  "id": 1,
+  "physicalTwins": [
+    {
+      "name": "PhysicalTwin1",
+      "metadata": {
+        "key1": "value1",
+        "key2": "value2"
+      }
+    },
+    {
+      "name": "PhysicalTwin2",
+      "metadata": {
+        "key1": "value1",
+        "key2": "value2"
+      }
+    }
+  ],
+  "digitalTwins": [
+    {
+      "name": "DigitalTwin1",
+      "source": "http://example.com/digitaltwin1",
+      "type": "simple",
+      "twinOf": ["PhysicalTwin1"],
+      "requirements": {
+        "preferredAffinity": "cloud",
+        "odte": 0.9
+      },
+      "deployments": [
+        {
+          "type": "Kubernetes",
+          "affinity": "cloud",
+          "configs": [
+            {
+	      "type": "ConfigMap",
+  	      "spec": "{\"apiVersion\":\"v1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"digital-twin-1-cloud\"},\"data\":{\"dt_conf.yaml\":\"digitalTwinId: digital-twin-1-cloud\\ntargetDeviceId: iiot-device-1\\nphysicalMqttBrokerAddress: physical-broker.default.svc.cluster.local\\nphysicalMqttBrokerPort: 1883\\ndigitalMqttBrokerAddress: digital-broker.default.svc.cluster.local\\ndigitalMqttBrokerPort: 1883\\nmetricsEnabled: true\\nhttpApiPort: 5555\\nprometheusHttpApiPort: 1234\\nexpectedMsgSec: 1\\nobservationBucketType: default\\nobservationBucketStart: 0.0\\nobservationBucketWidth: 0.005\\nobservationBucketCount: 1001\\nprimeNumbersComputationCount: 1000\\nshadowedThresholdMs: 1000\\nunBoundThresholdMs: 10000\\nodteSlidingWindowSec: 30\\nodteDesiredTimelinessSec: 1.0\\nodteExpectedMsgSec: 1.0\\nodteTargetPercentile: 0.9\\n\"}}"
+	    },
+            {
+              "type": "Deployment",
+              "spec": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"digital-twin-1-cloud\",\"labels\":{\"app\":\"digital-twin-1-cloud\"}},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"digital-twin-1-cloud\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"digital-twin-1-cloud\"},\"annotations\":{\"prometheus.io/port\":\"1234\",\"prometheus.io/scrape\":\"true\"}},\"spec\":{\"nodeSelector\":{\"dtm/zone\":\"cloud\"},\"imagePullSecrets\":[{\"name\":\"gitlab-registry-credentials\"}],\"containers\":[{\"name\":\"digital-twin\",\"image\":\"registry.gitlab.com/piconem-university/projects/dt-software-patterns/wldt-digital-twin-mqtt:0.7\",\"imagePullPolicy\":\"Always\",\"ports\":[{\"name\":\"http-api\",\"protocol\":\"TCP\",\"containerPort\":5555},{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"containerPort\":1234}],\"volumeMounts\":[{\"name\":\"digital-twin-config\",\"mountPath\":\"/usr/local/src/mvnapp/dt_conf.yaml\",\"subPath\":\"dt_conf.yaml\",\"readOnly\":true}]}],\"volumes\":[{\"name\":\"digital-twin-config\",\"configMap\":{\"name\":\"digital-twin-1-cloud\"}}]}}}}"
+            },
+            {
+              "type": "Service",
+              "spec": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"name\":\"digital-twin-1-cloud\"},\"spec\":{\"type\":\"NodePort\",\"selector\":{\"app\":\"digital-twin-1-cloud\"},\"ports\":[{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"port\":80,\"targetPort\":1234},{\"name\":\"http-api\",\"protocol\":\"TCP\",\"port\":5555,\"targetPort\":5555}]}}"
+            }
+          ]
+        },
+        {
+          "type": "Kubernetes",
+          "affinity": "edge",
+          "configs": [
+            {
+	      "type": "ConfigMap",
+  	      "spec": "{\"apiVersion\":\"v1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"digital-twin-1-edge\"},\"data\":{\"dt_conf.yaml\":\"digitalTwinId: digital-twin-1-edge\\ntargetDeviceId: iiot-device-1\\nphysicalMqttBrokerAddress: physical-broker.default.svc.cluster.local\\nphysicalMqttBrokerPort: 1883\\ndigitalMqttBrokerAddress: digital-broker.default.svc.cluster.local\\ndigitalMqttBrokerPort: 1883\\nmetricsEnabled: true\\nhttpApiPort: 5555\\nprometheusHttpApiPort: 1234\\nexpectedMsgSec: 1\\nobservationBucketType: default\\nobservationBucketStart: 0.0\\nobservationBucketWidth: 0.005\\nobservationBucketCount: 1001\\nprimeNumbersComputationCount: 1000\\nshadowedThresholdMs: 1000\\nunBoundThresholdMs: 10000\\nodteSlidingWindowSec: 30\\nodteDesiredTimelinessSec: 1.0\\nodteExpectedMsgSec: 1.0\\nodteTargetPercentile: 0.9\\n\"}}"
+	    },
+            {
+              "type": "Deployment",
+              "spec": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"digital-twin-1-edge\",\"labels\":{\"app\":\"digital-twin-1-edge\"}},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"digital-twin-1-edge\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"digital-twin-1-edge\"},\"annotations\":{\"prometheus.io/port\":\"1234\",\"prometheus.io/scrape\":\"true\"}},\"spec\":{\"nodeSelector\":{\"dtm/zone\":\"edge\"},\"imagePullSecrets\":[{\"name\":\"gitlab-registry-credentials\"}],\"containers\":[{\"name\":\"digital-twin\",\"image\":\"registry.gitlab.com/piconem-university/projects/dt-software-patterns/wldt-digital-twin-mqtt:0.7\",\"imagePullPolicy\":\"Always\",\"ports\":[{\"name\":\"http-api\",\"protocol\":\"TCP\",\"containerPort\":5555},{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"containerPort\":1234}],\"volumeMounts\":[{\"name\":\"digital-twin-config\",\"mountPath\":\"/usr/local/src/mvnapp/dt_conf.yaml\",\"subPath\":\"dt_conf.yaml\",\"readOnly\":true}]}],\"volumes\":[{\"name\":\"digital-twin-config\",\"configMap\":{\"name\":\"digital-twin-1-edge\"}}]}}}}"
+            },
+            {
+              "type": "Service",
+              "spec": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"name\":\"digital-twin-1-edge\"},\"spec\":{\"type\":\"NodePort\",\"selector\":{\"app\":\"digital-twin-1-edge\"},\"ports\":[{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"port\":80,\"targetPort\":1234},{\"name\":\"http-api\",\"protocol\":\"TCP\",\"port\":5555,\"targetPort\":5555}]}}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DigitalTwin2",
+      "source": "http://example.com/digitaltwin2",
+      "type": "simple",
+      "twinOf": ["PhysicalTwin2"],
+      "requirements": {
+        "preferredAffinity": "cloud",
+        "odte": 0.9
+      },
+      "deployments": [
+        {
+          "type": "Kubernetes",
+          "affinity": "cloud",
+          "configs": [
+            {
+	      "type": "ConfigMap",
+  	      "spec": "{\"apiVersion\":\"v1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"digital-twin-2-cloud\"},\"data\":{\"dt_conf.yaml\":\"digitalTwinId: digital-twin-2-cloud\\ntargetDeviceId: iiot-device-2\\nphysicalMqttBrokerAddress: physical-broker.default.svc.cluster.local\\nphysicalMqttBrokerPort: 1883\\ndigitalMqttBrokerAddress: digital-broker.default.svc.cluster.local\\ndigitalMqttBrokerPort: 1883\\nmetricsEnabled: true\\nhttpApiPort: 5555\\nprometheusHttpApiPort: 1234\\nexpectedMsgSec: 1\\nobservationBucketType: default\\nobservationBucketStart: 0.0\\nobservationBucketWidth: 0.005\\nobservationBucketCount: 1001\\nprimeNumbersComputationCount: 1000\\nshadowedThresholdMs: 1000\\nunBoundThresholdMs: 10000\\nodteSlidingWindowSec: 30\\nodteDesiredTimelinessSec: 1.0\\nodteExpectedMsgSec: 1.0\\nodteTargetPercentile: 0.9\\n\"}}"
+	    },
+            {
+              "type": "Deployment",
+              "spec": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"digital-twin-2-cloud\",\"labels\":{\"app\":\"digital-twin-2-cloud\"}},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"digital-twin-2-cloud\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"digital-twin-2-cloud\"},\"annotations\":{\"prometheus.io/port\":\"1234\",\"prometheus.io/scrape\":\"true\"}},\"spec\":{\"nodeSelector\":{\"dtm/zone\":\"cloud\"},\"imagePullSecrets\":[{\"name\":\"gitlab-registry-credentials\"}],\"containers\":[{\"name\":\"digital-twin\",\"image\":\"registry.gitlab.com/piconem-university/projects/dt-software-patterns/wldt-digital-twin-mqtt:0.7\",\"imagePullPolicy\":\"Always\",\"ports\":[{\"name\":\"http-api\",\"protocol\":\"TCP\",\"containerPort\":5555},{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"containerPort\":1234}],\"volumeMounts\":[{\"name\":\"digital-twin-config\",\"mountPath\":\"/usr/local/src/mvnapp/dt_conf.yaml\",\"subPath\":\"dt_conf.yaml\",\"readOnly\":true}]}],\"volumes\":[{\"name\":\"digital-twin-config\",\"configMap\":{\"name\":\"digital-twin-2-cloud\"}}]}}}}"
+            },
+            {
+              "type": "Service",
+              "spec": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"name\":\"digital-twin-2-cloud\"},\"spec\":{\"type\":\"NodePort\",\"selector\":{\"app\":\"digital-twin-2-cloud\"},\"ports\":[{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"port\":80,\"targetPort\":1234},{\"name\":\"http-api\",\"protocol\":\"TCP\",\"port\":5555,\"targetPort\":5555}]}}"
+            }
+          ]
+        },
+        {
+          "type": "Kubernetes",
+          "affinity": "edge",
+          "configs": [
+            {
+	      "type": "ConfigMap",
+  	      "spec": "{\"apiVersion\":\"v1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"digital-twin-2-edge\"},\"data\":{\"dt_conf.yaml\":\"digitalTwinId: digital-twin-2-edge\\ntargetDeviceId: iiot-device-2\\nphysicalMqttBrokerAddress: physical-broker.default.svc.cluster.local\\nphysicalMqttBrokerPort: 1883\\ndigitalMqttBrokerAddress: digital-broker.default.svc.cluster.local\\ndigitalMqttBrokerPort: 1883\\nmetricsEnabled: true\\nhttpApiPort: 5555\\nprometheusHttpApiPort: 1234\\nexpectedMsgSec: 1\\nobservationBucketType: default\\nobservationBucketStart: 0.0\\nobservationBucketWidth: 0.005\\nobservationBucketCount: 1001\\nprimeNumbersComputationCount: 1000\\nshadowedThresholdMs: 1000\\nunBoundThresholdMs: 10000\\nodteSlidingWindowSec: 30\\nodteDesiredTimelinessSec: 1.0\\nodteExpectedMsgSec: 1.0\\nodteTargetPercentile: 0.9\\n\"}}"
+	    },
+            {
+              "type": "Deployment",
+              "spec": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"digital-twin-2-edge\",\"labels\":{\"app\":\"digital-twin-2-edge\"}},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"digital-twin-2-edge\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"digital-twin-2-edge\"},\"annotations\":{\"prometheus.io/port\":\"1234\",\"prometheus.io/scrape\":\"true\"}},\"spec\":{\"nodeSelector\":{\"dtm/zone\":\"edge\"},\"imagePullSecrets\":[{\"name\":\"gitlab-registry-credentials\"}],\"containers\":[{\"name\":\"digital-twin\",\"image\":\"registry.gitlab.com/piconem-university/projects/dt-software-patterns/wldt-digital-twin-mqtt:0.7\",\"imagePullPolicy\":\"Always\",\"ports\":[{\"name\":\"http-api\",\"protocol\":\"TCP\",\"containerPort\":5555},{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"containerPort\":1234}],\"volumeMounts\":[{\"name\":\"digital-twin-config\",\"mountPath\":\"/usr/local/src/mvnapp/dt_conf.yaml\",\"subPath\":\"dt_conf.yaml\",\"readOnly\":true}]}],\"volumes\":[{\"name\":\"digital-twin-config\",\"configMap\":{\"name\":\"digital-twin-2-edge\"}}]}}}}"
+            },
+            {
+              "type": "Service",
+              "spec": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"name\":\"digital-twin-2-edge\"},\"spec\":{\"type\":\"NodePort\",\"selector\":{\"app\":\"digital-twin-2-edge\"},\"ports\":[{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"port\":80,\"targetPort\":1234},{\"name\":\"http-api\",\"protocol\":\"TCP\",\"port\":5555,\"targetPort\":5555}]}}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ComposedDigitalTwin1",
+      "source": "http://example.com/composeddigitaltwin1",
+      "type": "composed",
+      "twinOf": ["DigitalTwin1","DigitalTwin2"],
+      "requirements": {
+        "preferredAffinity": "cloud",
+        "odte": 0.9
+      },
+      "deployments": [
+        {
+          "type": "Kubernetes",
+          "affinity": "cloud",
+          "configs": [
+            {
+	      "type": "ConfigMap",
+  	      "spec": "{\"apiVersion\":\"v1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"composed-digital-twin-1-cloud\"},\"data\":{\"cdt_conf.yaml\":\"digitalTwinId: composed-digital-twin-1-cloud\\ndeviceIdList: iiot-device-1,iiot-device-2\\nresourceMap:\\n  energy: iot.sensor.energy\\n  temperature: iot.sensor.temperature\\naggregationAction: avg\\naggregationType: sample\\naggregationUnit: msg\\naggregationWindow: 10\\naggregationStateTopic: aggregated_state\\ntargetMqttBrokerAddress: digital-broker.default.svc.cluster.local\\ntargetMqttBrokerPort: 1883\\nmetricsEnabled: true\\naggregateWithStateMessages: true\\nhttpApiPort: 5555\\nprometheusHttpApiPort: 1234\\nexpectedMsgSec: 2\\nobservationBucketType: default\\nobservationBucketStart: 0.0\\nobservationBucketWidth: 0.005\\nobservationBucketCount: 50\\nprimeNumbersComputationCount: 10000\\nshadowedThresholdMs: 1000\\nunBoundThresholdMs: 10000\\nodteSlidingWindowSec: 30\\nodteDesiredTimelinessSec: 1.0\\nodteExpectedMsgSec: 2.0\\nodteTargetPercentile: 0.9\\n\"}}"
+	    },
+            {
+              "type": "Deployment",
+              "spec": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"composed-digital-twin-1-cloud\",\"labels\":{\"app\":\"composed-digital-twin-1-cloud\"}},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"composed-digital-twin-1-cloud\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"composed-digital-twin-1-cloud\"},\"annotations\":{\"prometheus.io/port\":\"1234\",\"prometheus.io/scrape\":\"true\"}},\"spec\":{\"nodeSelector\":{\"dtm/zone\":\"cloud\"},\"imagePullSecrets\":[{\"name\":\"gitlab-registry-credentials\"}],\"containers\":[{\"name\":\"digital-twin\",\"image\":\"registry.gitlab.com/piconem-university/projects/dt-software-patterns/wldt-composed-digital-twin-mqtt:0.3\",\"imagePullPolicy\":\"Always\",\"ports\":[{\"name\":\"http-api\",\"protocol\":\"TCP\",\"containerPort\":5555},{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"containerPort\":1234}],\"volumeMounts\":[{\"name\":\"composed-digital-twin-config\",\"mountPath\":\"/usr/local/src/mvnapp/cdt_conf.yaml\",\"subPath\":\"cdt_conf.yaml\",\"readOnly\":true}]}],\"volumes\":[{\"name\":\"composed-digital-twin-config\",\"configMap\":{\"name\":\"composed-digital-twin-1-cloud\"}}]}}}}"
+            },
+            {
+              "type": "Service",
+              "spec": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"name\":\"composed-digital-twin-1-cloud\"},\"spec\":{\"type\":\"NodePort\",\"selector\":{\"app\":\"composed-digital-twin-1-cloud\"},\"ports\":[{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"port\":80,\"targetPort\":1234},{\"name\":\"http-api\",\"protocol\":\"TCP\",\"port\":5555,\"targetPort\":5555}]}}"
+            }
+          ]
+        },
+        {
+          "type": "Kubernetes",
+          "affinity": "mec",
+          "configs": [
+           {
+	      "type": "ConfigMap",
+  	      "spec": "{\"apiVersion\":\"v1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"composed-digital-twin-1-mec\"},\"data\":{\"cdt_conf.yaml\":\"digitalTwinId: composed-digital-twin-1-mec\\ndeviceIdList: iiot-device-1,iiot-device-2\\nresourceMap:\\n  energy: iot.sensor.energy\\n  temperature: iot.sensor.temperature\\naggregationAction: avg\\naggregationType: sample\\naggregationUnit: msg\\naggregationWindow: 10\\naggregationStateTopic: aggregated_state\\ntargetMqttBrokerAddress: digital-broker.default.svc.cluster.local\\ntargetMqttBrokerPort: 1883\\nmetricsEnabled: true\\naggregateWithStateMessages: true\\nhttpApiPort: 5555\\nprometheusHttpApiPort: 1234\\nexpectedMsgSec: 2\\nobservationBucketType: default\\nobservationBucketStart: 0.0\\nobservationBucketWidth: 0.005\\nobservationBucketCount: 50\\nprimeNumbersComputationCount: 10000\\nshadowedThresholdMs: 1000\\nunBoundThresholdMs: 10000\\nodteSlidingWindowSec: 30\\nodteDesiredTimelinessSec: 1.0\\nodteExpectedMsgSec: 2.0\\nodteTargetPercentile: 0.9\\n\"}}"
+	    },
+            {
+              "type": "Deployment",
+              "spec": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"name\":\"composed-digital-twin-1-mec\",\"labels\":{\"app\":\"composed-digital-twin-1-mec\"}},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"composed-digital-twin-1-mec\"}},\"template\":{\"metadata\":{\"labels\":{\"app\":\"composed-digital-twin-1-mec\"},\"annotations\":{\"prometheus.io/port\":\"1234\",\"prometheus.io/scrape\":\"true\"}},\"spec\":{\"nodeSelector\":{\"dtm/zone\":\"mec\"},\"imagePullSecrets\":[{\"name\":\"gitlab-registry-credentials\"}],\"containers\":[{\"name\":\"digital-twin\",\"image\":\"registry.gitlab.com/piconem-university/projects/dt-software-patterns/wldt-composed-digital-twin-mqtt:0.3\",\"imagePullPolicy\":\"Always\",\"ports\":[{\"name\":\"http-api\",\"protocol\":\"TCP\",\"containerPort\":5555},{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"containerPort\":1234}],\"volumeMounts\":[{\"name\":\"composed-digital-twin-config\",\"mountPath\":\"/usr/local/src/mvnapp/cdt_conf.yaml\",\"subPath\":\"cdt_conf.yaml\",\"readOnly\":true}]}],\"volumes\":[{\"name\":\"composed-digital-twin-config\",\"configMap\":{\"name\":\"composed-digital-twin-1-mec\"}}]}}}}"
+            },
+            {
+              "type": "Service",
+              "spec": "{\"apiVersion\":\"v1\",\"kind\":\"Service\",\"metadata\":{\"name\":\"composed-digital-twin-1-mec\"},\"spec\":{\"type\":\"NodePort\",\"selector\":{\"app\":\"composed-digital-twin-1-mec\"},\"ports\":[{\"name\":\"http-metrics\",\"protocol\":\"TCP\",\"port\":80,\"targetPort\":1234},{\"name\":\"http-api\",\"protocol\":\"TCP\",\"port\":5555,\"targetPort\":5555}]}}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

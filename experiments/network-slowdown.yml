@@ -1,0 +1,46 @@
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: digital-twin-1-cloud
+spec:
+  action: delay
+  mode: all
+  selector:
+    labelSelectors:
+      'app': 'digital-twin-1-cloud'
+  delay:
+    latency: '750ms'
+    correlation: '25'
+    jitter: '750ms'
+  direction: from
+  target:
+    mode: all
+    selector:
+      namespaces:
+        - default
+      labelSelectors:
+        'app': 'physical-broker'
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: digital-twin-2-cloud
+spec:
+  action: delay
+  mode: all
+  selector:
+    labelSelectors:
+      'app': 'digital-twin-2-cloud'
+  delay:
+    latency: '750ms'
+    correlation: '25'
+    jitter: '750ms'
+  direction: from
+  target:
+    mode: all
+    selector:
+      namespaces:
+        - default
+      labelSelectors:
+        'app': 'physical-broker'

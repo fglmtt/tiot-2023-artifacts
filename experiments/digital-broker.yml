@@ -1,0 +1,71 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: digital-broker
+data:
+  mosquitto.conf: |
+    allow_anonymous true
+    listener 1883
+    persistence true
+    persistence_location /mosquitto/data/
+    log_type all
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: digital-broker
+  labels:
+    app: digital-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: digital-broker
+  template:
+    metadata:
+      labels:
+        app: digital-broker
+    spec:
+      containers:
+      - name: digital-broker
+        image: eclipse-mosquitto
+        ports:
+        - containerPort: 1883
+        - containerPort: 9001
+        volumeMounts:
+        - name: data
+          mountPath: /mosquitto/config/mosquitto.conf
+          subPath: mosquitto.conf
+      initContainers:
+      - name: copy
+        image: eclipse-mosquitto
+        command: ["sh", "-c", "cp /tmp/config/mosquitto.conf /tmp/data/"]
+        volumeMounts:
+        - mountPath: /tmp/config
+          name: config
+        - mountPath: /tmp/data
+          name: data
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap: 
+          name: digital-broker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: digital-broker
+spec:
+  selector:
+    app: digital-broker
+  ports:
+  - name: tcp-default
+    protocol: TCP
+    port: 1883
+    targetPort: 1883
+  - name: tcp-websocket
+    protocol: TCP
+    port: 9001
+    targetPort: 9001

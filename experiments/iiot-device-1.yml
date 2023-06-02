@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iiot-device-1
+data:
+  device_conf.yaml: |
+    deviceId: iiot-device-1
+    targetMqttBrokerAddress: physical-broker.default.svc.cluster.local
+    targetMqttBrokerPort: 1883
+    httpApiPort: 5555
+    updatePeriodMs: 1000
+    updateInitialDelayMs: 2000
+    aggregatedTelemetry: true
+    aggregatedTelemetryMsgSec: 1
+    singleResourceTelemetryEnabled: false
+    resourceMap:
+      energy: iot.sensor.energy
+      temperature: iot.sensor.temperature
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iiot-device-1
+  labels:
+    app: iiot-device-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iiot-device-1
+  template:
+    metadata:
+      labels:
+        app: iiot-device-1
+    spec:
+      imagePullSecrets:
+      - name: gitlab-registry-credentials
+      containers:
+      - name: iiot-device-1
+        image: registry.gitlab.com/piconem-university/projects/dt-software-patterns/iiot-device:0.3
+        ports:
+        - name: http-api
+          protocol: TCP
+          containerPort: 5555
+        volumeMounts:
+        - name: config
+          mountPath: /usr/local/src/mvnapp/device_conf.yaml
+          subPath: device_conf.yaml
+      volumes:
+      - name: config
+        configMap: 
+          name: iiot-device-1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iiot-device-1
+spec:
+  type: NodePort
+  selector:
+    app: iiot-device-1
+  ports:
+  - name: http-api
+    protocol: TCP
+    port: 5555
+    targetPort: 5555
