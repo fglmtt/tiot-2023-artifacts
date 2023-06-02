@@ -7,7 +7,7 @@ It serves to increase the reproducibility and understanding of our work.
 This repository is structured as follows:
 ```
 ./
-├── data/                                 # Data used to produce the graphs in the research paper
+├── data/                                 # Data used to plot the graphs included in the research paper
 ├── entanglement-aware-middleware/        # Source code of the entanglement-aware middleware for cyber-physical systems
 ├── experiments/                          # Scripts, configuration files, and instructions to reproduce the experiments
 ├── iiot-device/                          # Source code of the IIoT device emulator
