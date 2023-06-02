@@ -1,0 +1,10 @@
+{
+	"kubeconfig": "kubeconfig",
+	"prometheusURL": "http://prometheus.middleware.aws:31747/",
+	"iterations": 1,
+	"phaseDuration": 5,
+	"chaosSpecPath": "network-slowdown.yml",
+	"digitalTwinTarget": "composed-digital-twin-1-mec",
+	"clusterIP": "18.216.131.159",
+	"primes": 100000
+}
