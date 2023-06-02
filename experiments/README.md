@@ -4,7 +4,7 @@
 
 ### Entanglement-Aware Middleware for Cyber-Physical Systems
 
-See [these](entanglement-aware-middleware) instructions.
+See [these](../entanglement-aware-middleware) instructions.
 
 ### Labels
 
@@ -79,6 +79,12 @@ Deploy the digital broker, i.e., the MQTT broker being used by DTs:
 $ kubectl apply -f digital-broker.yml
 ```
 
+See [here](../iiot-device) to build a Docker image of an IIoT device.
+
+**Note 1**: edit the `image` fields in [iiot-device-1.yml](iiot-device-1.yml) and [iiot-device-2.yml](iiot-device-2.yml) to make them point to your own image registry.
+
+**Note 2**: edit the `imagePullSecrets` fields in [iiot-device-1.yml](iiot-device-1.yml) and [iiot-device-2.yml](iiot-device-2.yml) based on your own authorization tokens.
+
 Deploy the IIoT devices:
 ```
 $ kubectl apply -f iiot-device-1.yml
@@ -90,6 +96,10 @@ $ kubectl apply -f iiot-device-2.yml
 A cyber-physical application is a comprehensive construct describing digital representations (i.e., DTs) of the physical world (i.e., PTs). 
 In this case, the IIoT devices are the physical counterparts.
 
+**Note 3**: edit the `image` fields in [app.json](app.json) to make them point to your own image registry.
+
+**Note 4**: edit the `imagePullSecrets` fields in [app.json](app.json) based on your own authorization tokens.
+
 Deploy a cyber-physical application:
 ```
 $ ./create-app.sh <management-interface-ip>:<management-interface-port>/v1/apps app.json
@@ -97,12 +107,12 @@ $ ./create-app.sh <management-interface-ip>:<management-interface-port>/v1/apps 
 
 ### Grafana Dashboard
 
-Import [this](experiments/dashboard.json) JSON file as a dashboard in Grafana to visualize what is going on in your Kubernetes cluster. 
+Import [this](dashboard.json) JSON file as a dashboard in Grafana to visualize what is going on in your Kubernetes cluster. 
 See [these](https://grafana.com/docs/grafana/latest/dashboards/manage-dashboards/#import-a-dashboard) instructions.
 
 ## Run
 
-Edit [this](experiments/config.json) configuration file to fine tune the experiment parameters:
+Edit [this](config.json) configuration file to fine tune the experiment parameters:
 ```
 {
 	"kubeconfig": "/home/ubuntu/.kube/config",
