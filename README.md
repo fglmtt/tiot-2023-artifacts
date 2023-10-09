@@ -1,6 +1,6 @@
-# An Entanglement-Aware Middleware for Cyber-Physical Systems: Artifacts
+# An Entanglement-Aware Middleware for Digital Twins: Artifacts
 
-This repository contains the artifacts described in the research paper titled "An Entanglement-Aware Middleware for Cyber-Physical Systems."
+This repository contains the artifacts described in the research paper titled "An Entanglement-Aware Middleware for Digital Twins."
 This repository hosts any relevant artifacts that we used during our research. 
 It serves to increase the reproducibility and understanding of our work.
 
